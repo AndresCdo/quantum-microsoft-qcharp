@@ -1,3 +1,5 @@
 # Quantum
 
-Proyecto de computación cuantica.
+## Description
+
+Quantum computing project using Microsoft quantum ***Q#***.
