@@ -29,7 +29,7 @@ jobs:
         run: dotnet publish --no-build --configuration Release --output bin/Release/net6.0 QuantumRandomBitGenerator.csproj
       
       - name: Test
-        run: dotnet test --no-build --verbosity normal QuantumRandomBitGenerator.csproj
+        run: dotnet test QuantumRandomBitGenerator.csproj --no-build --verbosity normal
 
   docker:
     needs: test
