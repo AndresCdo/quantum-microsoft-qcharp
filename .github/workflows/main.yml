@@ -31,7 +31,19 @@ jobs:
       run: echo "TIMESTAMP=$(date +%s)" >> $GITHUB_ENV
 
     - name: Build Docker image
-      run: docker build . --file Dockerfile --tag quantum-random-bit-generator --build-arg TIMESTAMP=$TIMESTAMP
+      run: docker build . --file Dockerfile --tag quantum-random-bit-generator --build-arg TIMESTAMP=$TIMESTAMP --input path=.
 
     - name: Run Docker container
-      run: docker run quantum-random-bit-generator 
+      run: docker run quantum-random-bit-generator
+    
+  
+  save-artifact:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Archive artifact
+      uses: actions/upload-artifact@v2
+      
+      with:
+        name: quantum-random-bit-generator
+        path: /home/runner/work/QuantumRandomBitGenerator/QuantumRandomBitGenerator/bin/Debug/net6.0/QuantumRandomBitGenerator.dll
