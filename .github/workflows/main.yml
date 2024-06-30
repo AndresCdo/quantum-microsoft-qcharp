@@ -25,7 +25,7 @@ jobs:
       run: dotnet build --no-restore
 
     - name: Test
-      run: dotnet test --no-build --verbosity normal Quantum.csproj
+      run: dotnet test --no-build --verbosity normal QuantumRandomBitGenerator.csproj
 
     - name: Set time
       run: echo "::set-env name=TIMESTAMP::$(date +%s)"
