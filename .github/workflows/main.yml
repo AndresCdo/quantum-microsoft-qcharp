@@ -31,7 +31,7 @@ jobs:
       run: echo "TIMESTAMP=$(date +%s)" >> $GITHUB_ENV
 
     - name: Build Docker image
-      run: docker build . --file Dockerfile --tag quantum-random-bit-generator --build-arg TIMESTAMP=$TIMESTAMP --input path=.
+      run: docker build . --file Dockerfile --tag quantum-random-bit-generator --build-arg TIMESTAMP=$TIMESTAMP 
 
     - name: Run Docker container
       run: docker run quantum-random-bit-generator
