@@ -1,0 +1,83 @@
+name: Quantum Random Bit Generator CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release QuantumRandomBitGenerator.csproj
+      
+      - name: Publish
+        run: dotnet publish --no-build --configuration Release --output bin/Release/net6.0 QuantumRandomBitGenerator.csproj
+      
+      - name: Test
+        run: dotnet test QuantumRandomBitGenerator.csproj --no-build --verbosity normal --configuration Release
+
+      - name: Archive artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: quantum-random-bit-generator
+          path: |
+            bin/Release/net6.0/QuantumRandomBitGenerator.dll
+            bin/Release/net6.0/QuantumRandomBitGenerator.deps.json
+            bin/Release/net6.0/QuantumRandomBitGenerator.runtimeconfig.json
+            bin/Release/net6.0/QuantumRandomBitGenerator.pdb
+            bin/Release/net6.0/QuantumRandomBitGenerator
+
+  docker:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set time
+        run: echo "TIMESTAMP=$(date +%s)" >> $GITHUB_ENV
+
+      - name: Build Docker image
+        run: docker build . --file Dockerfile --tag quantum-random-bit-generator --build-arg TIMESTAMP=$TIMESTAMP 
+
+      - name: Run Docker container
+        run: docker run quantum-random-bit-generator
+
+  build-and-push:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: GitHub Container Registry login
+        run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      
+      - name: Set repository name lowercase
+        run: echo "REPOSITORY_NAME=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+      - name: Build and push Docker image
+        run: docker buildx build . --file Dockerfile --tag ghcr.io/$REPOSITORY_NAME:latest --push
