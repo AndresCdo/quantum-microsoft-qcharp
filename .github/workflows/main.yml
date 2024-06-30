@@ -22,9 +22,10 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
 
-      - name: Build and Test
+      - name: Build and test
         run: |
           dotnet build --no-restore --configuration Release QuantumRandomBitGenerator.csproj
+          dotnet publish --no-build --configuration Release --output bin/Release/net6.0 QuantumRandomBitGenerator.csproj
           dotnet test --no-build --verbosity normal QuantumRandomBitGenerator.csproj
 
   docker:
