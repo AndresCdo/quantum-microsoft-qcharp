@@ -28,7 +28,7 @@ jobs:
       run: dotnet test --no-build --verbosity normal QuantumRandomBitGenerator.csproj
 
     - name: Set time
-      run: echo "::set-env name=TIMESTAMP::$(date +%s)"
+      run: echo "TIMESTAMP=$(date +%s)" >> $GITHUB_ENV
 
     - name: Build Docker image
       run: docker build . --file Dockerfile --tag quantum-random-bit-generator --build-arg TIMESTAMP=$TIMESTAMP
